@@ -1,176 +1,7 @@
-var sequences = [
-    {
-        "sequence": "1"
-    },
-    {
-        "sequence": "2"
-    },
-    {
-        "sequence": "3"
-    },
-    {
-        "sequence": "4"
-    },
-    {
-        "sequence": "5"
-    },
-    {
-        "sequence": "6"
-    },
-    {
-        "sequence": "1r2r3r4r5r"
-    },
-    {
-        "sequence": "12345"
-    },
-    {
-        "sequence": "678"
-    },
-    {
-        "sequence": "q"
-    },
-    {
-        "sequence": "w"
-    },
-    {
-        "sequence": "e"
-    },
-    {
-        "sequence": "r"
-    },
-    {
-        "sequence": "t"
-    },
-    {
-        "sequence": "a"
-    },
-    {
-        "sequence": "s"
-    },
-    {
-        "sequence": "d"
-    },
-    {
-        "sequence": "f"
-    },
-    {
-        "sequence": "5t"
-    }, 
-    {
-        "sequence": "5t4t"
-    }, 
-    {
-        "sequence": "3t"
-    },  
-    {
-        "sequence": "3w"
-    }, 
-    {
-        "sequence": "66eee"
-    }, 
-    {
-        "sequence": "66www"
-    }, 
-    {
-        "sequence": "66sss"
-    }, 
-    {
-        "sequence": "66ddd"
-    }, 
-    {
-        "sequence": "6e7e8e"
-    }, 
-    {
-        "sequence": "6w7w8w"
-    }, 
-    {
-        "sequence": "6d7d8d"
-    }, 
-    {
-        "sequence": "6s7s8s"
-    },
-    {
-        "sequence": "1",
-        "modifier": "CTRL"
-    },
-    {
-        "sequence": "2",
-        "modifier": "CTRL"
-    },
-    {
-        "sequence": "3",
-        "modifier": "CTRL"
-    },
-    {
-        "sequence": "4",
-        "modifier": "CTRL"
-    },
-    {
-        "sequence": "5",
-        "modifier": "CTRL"
-    },
-    {
-        "sequence": "6",
-        "modifier": "CTRL"
-    },
-    {
-        "sequence": "7",
-        "modifier": "CTRL"
-    },
-    {
-        "sequence": "8",
-        "modifier": "CTRL"
-    },
-    {
-        "sequence": "9",
-        "modifier": "CTRL"
-    },
-    {
-        "sequence": "0",
-        "modifier": "CTRL"
-    },
-    {
-        "sequence": "1",
-        "modifier": "SHIFT"
-    },
-    {
-        "sequence": "2",
-        "modifier": "SHIFT"
-    },
-    {
-        "sequence": "3",
-        "modifier": "SHIFT"
-    },
-    {
-        "sequence": "4",
-        "modifier": "SHIFT"
-    },
-    {
-        "sequence": "5",
-        "modifier": "SHIFT"
-    }
-]
-
 var codeToKey = {
-    "48": "0",
-    "49": "1",
-    "50": "2",
-    "51": "3",
-    "52": "4",
-    "53": "5",
-    "54": "6",
-    "55": "7",
-    "56": "8",
-    "57": "9",
-    "81": "q",
-    "87": "w",
-    "69": "e",
-    "82": "r",
-    "84": "t",
-    "65": "a",
-    "83": "s",
-    "68": "d",
-    "70": "f",
+    "48": "0", "49": "1", "50": "2", "51": "3", "52": "4", "53": "5", "54": "6", 
+    "55": "7", "56": "8", "57": "9", "81": "q", "87": "w", "69": "e", 
+    "82": "r", "84": "t", "65": "a", "83": "s", "68": "d", "70": "f"
 }
 
 function getKey(code) {
@@ -178,20 +9,27 @@ function getKey(code) {
 }
 
 function getRandomIndex(max) {
-    return Math.floor(Math.random() * Math.floor(max));
+    turn++;
+    if (turn % 2) {
+        return 0;
+    } else {
+        return Math.floor(Math.random() * Math.floor(max));
+    }
 }
 
 function processWrong() {
-    input = "";
-    wrong += 1;
-    sequenceIndex = 0;
-    last = "wrong";
-    if (!wrongSpread[sequences[sequenceKey].sequence]) {
-        wrongSpread[sequences[sequenceKey].sequence] = 0;
+    if (last != "wrong") {
+        input = "";
+        wrong += 1;
+        sequenceIndex = 0;
+        last = "wrong";
+        if (!wrongSpread[sequences[sequenceKey].text]) {
+            wrongSpread[sequences[sequenceKey].text] = 0;
+        }
+    
+        wrongSpread[sequences[sequenceKey].text] += 1;
+        avg = getAvgTime();
     }
-
-    wrongSpread[sequences[sequenceKey].sequence] += 1;
-    avg = getAvgTime();
 }
 
 function processCorrect() {
@@ -204,8 +42,7 @@ function getAvgTime() {
 }
 
 function updateUI() {
-    var modifier = getCurrentModifier(sequenceKey) ? getCurrentModifier(sequenceKey) + " + " : "";
-    document.getElementById("sequence").innerText = modifier + sequences[sequenceKey].sequence;
+    document.getElementById("sequence").innerText = sequences[sequenceKey].text;
     document.getElementById("input").innerText = input;
     document.getElementById("correct").innerText = correct + (last === "correct" ? " -" : "");
     document.getElementById("wrong").innerText = wrong + (last === "wrong" ? " -" : "");
@@ -216,7 +53,7 @@ function updateUI() {
     var sorted = [];
     for (var key in wrongSpread) {
         sorted.push({
-            "sequence": key,
+            "text": key,
             "wrong": wrongSpread[key]
         });
     }
@@ -226,7 +63,7 @@ function updateUI() {
     });
 
     for (var i = 0; i < sorted.length; i++) {
-        wrongHTML += `<div>${sorted[i].sequence}: ${sorted[i].wrong}</div>`
+        wrongHTML += `<div>${sorted[i].text}: ${sorted[i].wrong}</div>`
     }
 
     $("#spread").html(wrongHTML);
@@ -247,6 +84,8 @@ var start = Date.now();
 var avg = 0;
 var input = "";
 var last = "";
+var turn = 0;
+var keyStrokeCount = 0;
 
 var sequenceIndex = 0;
 var sequenceKey = getRandomIndex(sequences.length);
@@ -254,15 +93,22 @@ var sequenceKey = getRandomIndex(sequences.length);
 updateUI();
 
 document.getElementById("program").addEventListener("keydown", function (event) {
+
+    keyStrokeCount += 1;
+
     var currentSequence = getCurrentSequence(sequenceKey);
     var currentModifier = getCurrentModifier(sequenceKey);
-    if (sequenceIndex < currentSequence.length) {
+    var currentLength = currentSequence.length;
+    if (sequenceIndex < currentLength) {
         if (currentModifier) {
             if (currentModifier === "CTRL") {
-                if (getKey(event.keyCode) === currentSequence[sequenceIndex] && event.ctrlKey) {
+                if (event.ctrlKey && getKey(event.keyCode) === currentSequence[sequenceIndex]) {
+                    input += currentSequence[sequenceIndex];
                     processCorrect();
-                } else if (getKey(event.keyCode) !== currentSequence[sequenceIndex] && !event.ctrlKey) {
+                } else if (!event.ctrlKey) {
                     processWrong();
+                } else if (getKey(event.keyCode) && getKey(event.keyCode) !== currentSequence[sequenceIndex]) {
+                    processWrong()
                 }
             } else if (currentModifier === "SHIFT") {
                 if (getKey(event.keyCode) === currentSequence[sequenceIndex] && event.shiftKey) {
@@ -272,16 +118,17 @@ document.getElementById("program").addEventListener("keydown", function (event) 
                 }
             }
         } else {
-            if (getKey(event.keyCode) == currentSequence[sequenceIndex]) {
-                input += getKey(event.keyCode);
+            var keyPressed = getKey(event.keyCode);
+            if (keyPressed === currentSequence[sequenceIndex]) {
                 processCorrect();
-            } else if (last !== "wrong") {
+                input += getKey(event.keyCode);
+            } else {
                 processWrong();
             }
         }
     }
     
-    if (sequenceIndex >= currentSequence.length) {
+    if (sequenceIndex >= currentLength) {
         input = "";
         correct += 1;
         sequenceIndex = 0;
