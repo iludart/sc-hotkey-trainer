@@ -9,26 +9,15 @@ function getKey(code) {
 }
 
 function getRandomIndex(max) {
-    turn++;
-    if (turn % 2) {
-        return 0;
-    } else {
-        return Math.floor(Math.random() * Math.floor(max));
-    }
+    return Math.floor(Math.random() * Math.floor(max));
 }
 
 function processWrong() {
     if (last != "wrong") {
         input = "";
-        wrong += 1;
         sequenceIndex = 0;
         last = "wrong";
-        if (!wrongSpread[sequences[sequenceKey].text]) {
-            wrongSpread[sequences[sequenceKey].text] = 0;
-        }
-    
-        wrongSpread[sequences[sequenceKey].text] += 1;
-        avg = getAvgTime();
+        streak = 0;
     }
 }
 
@@ -37,36 +26,12 @@ function processCorrect() {
     last = "correct";
 }
 
-function getAvgTime() {
-    return (((Date.now() - start) / (correct + wrong)) / 1000).toFixed(2);
-}
-
 function updateUI() {
     document.getElementById("sequence").innerText = sequences[sequenceKey].text;
     document.getElementById("input").innerText = input;
-    document.getElementById("correct").innerText = correct + (last === "correct" ? " -" : "");
-    document.getElementById("wrong").innerText = wrong + (last === "wrong" ? " -" : "");
-    document.getElementById("avg").innerText = avg;
-    document.getElementById("accuracy").innerText = ((correct / (correct + wrong)) * 100).toFixed(2);
-    var wrongHTML = "";
-    
-    var sorted = [];
-    for (var key in wrongSpread) {
-        sorted.push({
-            "text": key,
-            "wrong": wrongSpread[key]
-        });
-    }
-
-    sorted.sort(function(a, b) {
-        return b.wrong - a.wrong;
-    });
-
-    for (var i = 0; i < sorted.length; i++) {
-        wrongHTML += `<div>${sorted[i].text}: ${sorted[i].wrong}</div>`
-    }
-
-    $("#spread").html(wrongHTML);
+    document.getElementById("streak").innerText = streak;
+    document.getElementById("strokes").innerText = keyStrokeCount;
+    document.getElementById("apm").innerText = getAPM();
 }
 
 function getCurrentSequence(index) {
@@ -77,16 +42,18 @@ function getCurrentModifier(index) {
     return sequences[index].modifier;
 }
 
+function getAPM() {
+    var timespan = (Date.now() - start) / 1000;
+    var apm = (60 / timespan) * keyStrokeCount;
+    return apm.toFixed();
+}
+
 var correct = 0;
-var wrong = 0;
-var wrongSpread = {};
 var start = Date.now();
-var avg = 0;
 var input = "";
 var last = "";
-var turn = 0;
 var keyStrokeCount = 0;
-
+var streak = 0;
 var sequenceIndex = 0;
 var sequenceKey = getRandomIndex(sequences.length);
 
@@ -134,7 +101,7 @@ document.getElementById("program").addEventListener("keydown", function (event) 
         sequenceIndex = 0;
         sequenceKey = getRandomIndex(sequences.length);
         last = "correct";
-        avg = getAvgTime();
+        streak += 1;
     }
 
     updateUI();
